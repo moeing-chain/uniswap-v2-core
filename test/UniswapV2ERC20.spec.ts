@@ -36,6 +36,14 @@ describe('UniswapV2ERC20', () => {
   const wallet = new Wallet("0xe3d9be2e6430a9db8291ab1853f5ec2467822b33a1a08825a22fab1425d2bff9", provider)
   const other = new Wallet("0x5a09e9d6be2cdc7de8f6beba300e52823493cd23357b1ca14a9c36764d600f5e", provider)
 
+  provider.on('debug', event => {
+    if (event.action == 'request') {
+      console.log(">>>", event.request)
+    } else if (event.action == 'response') {
+      console.log("<<<", "id=" + event.request.id, event.response)
+    }
+  })
+
   let token: Contract
   beforeEach(async () => {
     token = await deployContract(wallet, ERC20, [TOTAL_SUPPLY])

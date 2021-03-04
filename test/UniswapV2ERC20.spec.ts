@@ -7,6 +7,9 @@ import { ecsign } from 'ethereumjs-util'
 
 import { expandTo18Decimals, getApprovalDigest } from './shared/utilities'
 
+import { JsonRpcProvider } from '@ethersproject/providers'
+import { Wallet } from '@ethersproject/wallet'
+
 import ERC20 from '../build/ERC20.json'
 
 chai.use(solidity)
@@ -22,12 +25,16 @@ const TOTAL_SUPPLY = expandTo18Decimals(10000)
 const TEST_AMOUNT = expandTo18Decimals(10)
 
 describe('UniswapV2ERC20', () => {
-  const provider = new MockProvider({ganacheOptions: {
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  }})
-  const [wallet, other] = provider.getWallets()
+  // const provider = new MockProvider({ganacheOptions: {
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // }})
+  // const [wallet, other] = provider.getWallets()
+
+  const provider = new JsonRpcProvider("http://127.0.0.1:8545")
+  const wallet = new Wallet("0xe3d9be2e6430a9db8291ab1853f5ec2467822b33a1a08825a22fab1425d2bff9", provider)
+  const other = new Wallet("0x5a09e9d6be2cdc7de8f6beba300e52823493cd23357b1ca14a9c36764d600f5e", provider)
 
   let token: Contract
   beforeEach(async () => {

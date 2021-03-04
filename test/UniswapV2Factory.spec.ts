@@ -4,6 +4,9 @@ import { constants, utils } from 'ethers'
 import { BigNumber } from 'ethers'
 import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
 
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers'
+import { Wallet } from '@ethersproject/wallet'
+
 import { getCreate2Address } from './shared/utilities'
 import { factoryFixture } from './shared/fixtures'
 
@@ -21,17 +24,21 @@ const TEST_ADDRESSES: [string, string] = [
 ]
 
 describe('UniswapV2Factory', () => {
-  const provider = new MockProvider({ganacheOptions: {
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  }})
-  const [wallet, other] = provider.getWallets()
-  const loadFixture = createFixtureLoader([wallet, other], provider)
+  // const provider = new MockProvider({ganacheOptions: {
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // }})
+  // const [wallet, other] = provider.getWallets()
+  const provider = new JsonRpcProvider("http://127.0.0.1:8545")
+  const wallet = new Wallet("0xe3d9be2e6430a9db8291ab1853f5ec2467822b33a1a08825a22fab1425d2bff9", provider)
+  const other = new Wallet("0x5a09e9d6be2cdc7de8f6beba300e52823493cd23357b1ca14a9c36764d600f5e", provider)
+
+  // const loadFixture = createFixtureLoader([wallet, other], provider)
 
   let factory: Contract
   beforeEach(async () => {
-    const fixture = await loadFixture(factoryFixture)
+    const fixture = await factoryFixture([wallet], null as unknown as Web3Provider)
     factory = fixture.factory
   })
 

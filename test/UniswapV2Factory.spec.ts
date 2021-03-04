@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { AddressZero } from 'ethers/constants'
-import { bigNumberify } from 'ethers/utils'
+import { constants, utils } from 'ethers'
+import { BigNumber } from 'ethers'
 import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
 
 import { getCreate2Address } from './shared/utilities'
@@ -11,19 +11,23 @@ import UniswapV2Pair from '../build/UniswapV2Pair.json'
 
 chai.use(solidity)
 
+const AddressZero = constants.AddressZero
+const bigNumberify = BigNumber.from
+
+
 const TEST_ADDRESSES: [string, string] = [
   '0x1000000000000000000000000000000000000000',
   '0x2000000000000000000000000000000000000000'
 ]
 
 describe('UniswapV2Factory', () => {
-  const provider = new MockProvider({
+  const provider = new MockProvider({ganacheOptions: {
     hardfork: 'istanbul',
     mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
     gasLimit: 9999999
-  })
+  }})
   const [wallet, other] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet, other])
+  const loadFixture = createFixtureLoader([wallet, other], provider)
 
   let factory: Contract
   beforeEach(async () => {

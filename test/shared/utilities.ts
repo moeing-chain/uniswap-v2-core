@@ -1,14 +1,22 @@
 import { Contract } from 'ethers'
-import { Web3Provider } from 'ethers/providers'
+import { Web3Provider } from '@ethersproject/providers'
 import {
   BigNumber,
-  bigNumberify,
-  getAddress,
-  keccak256,
-  defaultAbiCoder,
-  toUtf8Bytes,
-  solidityPack
-} from 'ethers/utils'
+  utils,
+  // bigNumberify,
+  // getAddress,
+  // keccak256,
+  // defaultAbiCoder,
+  // toUtf8Bytes,
+  // solidityPack
+} from 'ethers'
+
+const bigNumberify = BigNumber.from
+const getAddress = utils.getAddress
+const keccak256 = utils.keccak256
+const defaultAbiCoder = utils.defaultAbiCoder
+const toUtf8Bytes = utils.toUtf8Bytes
+const solidityPack = utils.solidityPack
 
 const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
@@ -81,7 +89,7 @@ export async function getApprovalDigest(
 
 export async function mineBlock(provider: Web3Provider, timestamp: number): Promise<void> {
   await new Promise(async (resolve, reject) => {
-    ;(provider._web3Provider.sendAsync as any)(
+    ;(provider.provider.sendAsync as any)(
       { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
       (error: any, result: any): void => {
         if (error) {

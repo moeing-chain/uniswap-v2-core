@@ -1,11 +1,14 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
 import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 
 import { expandTo18Decimals, mineBlock, encodePrice } from './shared/utilities'
 import { pairFixture } from './shared/fixtures'
-import { AddressZero } from 'ethers/constants'
+import { constants } from 'ethers'
+
+const bigNumberify = BigNumber.from
+const AddressZero = constants.AddressZero
 
 const MINIMUM_LIQUIDITY = bigNumberify(10).pow(3)
 
@@ -16,13 +19,13 @@ const overrides = {
 }
 
 describe('UniswapV2Pair', () => {
-  const provider = new MockProvider({
+  const provider = new MockProvider({ganacheOptions: {
     hardfork: 'istanbul',
     mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
     gasLimit: 9999999
-  })
+  }})
   const [wallet, other] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  const loadFixture = createFixtureLoader([wallet], provider)
 
   let factory: Contract
   let token0: Contract

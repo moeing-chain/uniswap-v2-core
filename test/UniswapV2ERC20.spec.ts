@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { MaxUint256 } from 'ethers/constants'
-import { bigNumberify, hexlify, keccak256, defaultAbiCoder, toUtf8Bytes } from 'ethers/utils'
+import { constants, utils, BigNumber } from 'ethers'
+// import { bigNumberify, hexlify, keccak256, defaultAbiCoder, toUtf8Bytes } from 'ethers'
 import { solidity, MockProvider, deployContract } from 'ethereum-waffle'
 import { ecsign } from 'ethereumjs-util'
 
@@ -11,15 +11,22 @@ import ERC20 from '../build/ERC20.json'
 
 chai.use(solidity)
 
+const MaxUint256 = constants.MaxUint256
+const bigNumberify = BigNumber.from
+const hexlify = utils.hexlify
+const keccak256 = utils.keccak256
+const defaultAbiCoder = utils.defaultAbiCoder
+const toUtf8Bytes = utils.toUtf8Bytes
+
 const TOTAL_SUPPLY = expandTo18Decimals(10000)
 const TEST_AMOUNT = expandTo18Decimals(10)
 
 describe('UniswapV2ERC20', () => {
-  const provider = new MockProvider({
+  const provider = new MockProvider({ganacheOptions: {
     hardfork: 'istanbul',
     mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
     gasLimit: 9999999
-  })
+  }})
   const [wallet, other] = provider.getWallets()
 
   let token: Contract

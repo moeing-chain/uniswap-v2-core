@@ -36,6 +36,14 @@ describe('UniswapV2Factory', () => {
 
   // const loadFixture = createFixtureLoader([wallet, other], provider)
 
+  provider.on('debug', event => {
+    if (event.action == 'request') {
+      console.log(">>>", event.request)
+    } else if (event.action == 'response') {
+      console.log("<<<", "id=" + event.request.id, event.response)
+    }
+  })
+
   let factory: Contract
   beforeEach(async () => {
     const fixture = await factoryFixture([wallet], null as unknown as Web3Provider)
@@ -84,7 +92,8 @@ describe('UniswapV2Factory', () => {
 
   it('setFeeTo', async () => {
     await expect(factory.connect(other).setFeeTo(other.address)).to.be.revertedWith('UniswapV2: FORBIDDEN')
-    await factory.setFeeTo(wallet.address)
+    const tx = await factory.setFeeTo(wallet.address)
+    await tx.wait()
     expect(await factory.feeTo()).to.eq(wallet.address)
   })
 

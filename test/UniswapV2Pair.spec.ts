@@ -33,6 +33,14 @@ describe('UniswapV2Pair', () => {
 
   // const loadFixture = createFixtureLoader([wallet], provider)
 
+  provider.on('debug', event => {
+    if (event.action == 'request') {
+      console.log(">>>", event.request)
+    } else if (event.action == 'response') {
+      console.log("<<<", "id=" + event.request.id, event.response)
+    }
+  })
+
   let factory: Contract
   let token0: Contract
   let token1: Contract
@@ -48,8 +56,8 @@ describe('UniswapV2Pair', () => {
   it('mint', async () => {
     const token0Amount = expandTo18Decimals(1)
     const token1Amount = expandTo18Decimals(4)
-    await token0.transfer(pair.address, token0Amount)
-    await token1.transfer(pair.address, token1Amount)
+    const tx1 = await token0.transfer(pair.address, token0Amount); await tx1.wait()
+    const tx2 = await token1.transfer(pair.address, token1Amount); await tx2.wait()
 
     const expectedLiquidity = expandTo18Decimals(2)
     await expect(pair.mint(wallet.address, overrides))
@@ -72,9 +80,9 @@ describe('UniswapV2Pair', () => {
   })
 
   async function addLiquidity(token0Amount: BigNumber, token1Amount: BigNumber) {
-    await token0.transfer(pair.address, token0Amount)
-    await token1.transfer(pair.address, token1Amount)
-    await pair.mint(wallet.address, overrides)
+    const tx1 = await token0.transfer(pair.address, token0Amount); await tx1.wait()
+    const tx2 = await token1.transfer(pair.address, token1Amount); await tx2.wait()
+    const tx3 = await pair.mint(wallet.address, overrides);        await tx3.wait()
   }
   const swapTestCases: BigNumber[][] = [
     [1, 5, 10, '1662497915624478906'],
@@ -90,8 +98,8 @@ describe('UniswapV2Pair', () => {
   swapTestCases.forEach((swapTestCase, i) => {
     it(`getInputPrice:${i}`, async () => {
       const [swapAmount, token0Amount, token1Amount, expectedOutputAmount] = swapTestCase
-      await addLiquidity(token0Amount, token1Amount)
-      await token0.transfer(pair.address, swapAmount)
+      await addLiquidity(token0Amount, token1Amount);
+      const tx1 = await token0.transfer(pair.address, swapAmount); await tx1.wait()
       await expect(pair.swap(0, expectedOutputAmount.add(1), wallet.address, '0x', overrides)).to.be.revertedWith(
         'UniswapV2: K'
       )
@@ -109,7 +117,7 @@ describe('UniswapV2Pair', () => {
     it(`optimistic:${i}`, async () => {
       const [outputAmount, token0Amount, token1Amount, inputAmount] = optimisticTestCase
       await addLiquidity(token0Amount, token1Amount)
-      await token0.transfer(pair.address, inputAmount)
+      const tx1 = await token0.transfer(pair.address, inputAmount); await tx1.wait()
       await expect(pair.swap(outputAmount.add(1), 0, wallet.address, '0x', overrides)).to.be.revertedWith(
         'UniswapV2: K'
       )

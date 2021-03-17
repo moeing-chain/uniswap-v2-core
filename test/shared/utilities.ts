@@ -1,5 +1,5 @@
 import { Contract } from 'ethers'
-import { Web3Provider } from '@ethersproject/providers'
+import { Web3Provider, JsonRpcProvider } from '@ethersproject/providers'
 import {
   BigNumber,
   utils,
@@ -87,19 +87,20 @@ export async function getApprovalDigest(
   )
 }
 
-export async function mineBlock(provider: Web3Provider, timestamp: number): Promise<void> {
-  await new Promise(async (resolve, reject) => {
-    ;(provider.provider.sendAsync as any)(
-      { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
-      (error: any, result: any): void => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(result)
-        }
-      }
-    )
-  })
+export async function mineBlock(provider: JsonRpcProvider, timestamp: number): Promise<void> {
+  // await new Promise(async (resolve, reject) => {
+  //   ;(provider.provider.sendAsync as any)(
+  //     { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
+  //     (error: any, result: any): void => {
+  //       if (error) {
+  //         reject(error)
+  //       } else {
+  //         resolve(result)
+  //       }
+  //     }
+  //   )
+  // })
+  return provider.send("evm_mine", ['0x'+timestamp.toString(16)])
 }
 
 export function encodePrice(reserve0: BigNumber, reserve1: BigNumber) {
